@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { RunCard } from '@/components/run/RunCard';
 import { createClient } from '@/lib/supabase/server';
 
@@ -19,7 +20,20 @@ export default async function RecentRunsPage() {
       </div>
 
       {(runs ?? []).length === 0 ? (
-        <Card className="p-6 text-sm text-gray-500">No runs yet.</Card>
+        <Card className="p-8 text-center text-sm text-gray-500">
+          <p className="text-base font-medium text-gray-900">No runs yet</p>
+          <p className="mt-1 text-sm text-gray-500">
+            Runs will appear here once you submit a workflow and generate a document.
+          </p>
+          <div className="mt-4 flex justify-center gap-3">
+            <a href="/workflows/new">
+              <Button>Create Workflow</Button>
+            </a>
+            <a href="/workflows">
+              <Button className="bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50">View Workflows</Button>
+            </a>
+          </div>
+        </Card>
       ) : (
         <div className="space-y-3">
           {(runs ?? []).map((run) => (

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
 
@@ -45,44 +46,61 @@ export default async function DashboardPage() {
 
       <section className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900">Recent Runs</h2>
-        <div className="mt-4 overflow-auto">
-          <table className="w-full min-w-[620px] text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 text-left text-xs uppercase tracking-wide text-gray-500">
-                <th className="px-2 py-3">Workflow</th>
-                <th className="px-2 py-3">Timestamp</th>
-                <th className="px-2 py-3">Status</th>
-                <th className="px-2 py-3">Open</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(recentRunsRes.data ?? []).map((run) => (
-                <tr key={run.id} className="border-b border-gray-50">
-                  <td className="px-2 py-3 text-gray-700">{(run.workflows as { title?: string } | null)?.title ?? 'Workflow'}</td>
-                  <td className="px-2 py-3 text-gray-600">{formatDate(run.created_at)}</td>
-                  <td className="px-2 py-3">
-                    <Badge
-                      className={
-                        run.status === 'complete'
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : run.status === 'failed'
-                            ? 'bg-rose-100 text-rose-700'
-                            : 'bg-amber-100 text-amber-700'
-                      }
-                    >
-                      {run.status}
-                    </Badge>
-                  </td>
-                  <td className="px-2 py-3">
-                    <Link href={`/runs/${run.id}`} className="text-brand-700 hover:text-brand-600">
-                      View
-                    </Link>
-                  </td>
+        {(recentRunsRes.data ?? []).length === 0 ? (
+          <div className="mt-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+            <p className="text-base font-medium text-gray-900">No runs yet</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Once you run a workflow, the latest executions will appear here with timestamps and status.
+            </p>
+            <div className="mt-4 flex justify-center gap-3">
+              <Link href="/workflows/new">
+                <Button>Build a Workflow</Button>
+              </Link>
+              <Link href="/workflows">
+                <Button className="bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50">Browse Workflows</Button>
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 overflow-auto">
+            <table className="w-full min-w-[620px] text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 text-left text-xs uppercase tracking-wide text-gray-500">
+                  <th className="px-2 py-3">Workflow</th>
+                  <th className="px-2 py-3">Timestamp</th>
+                  <th className="px-2 py-3">Status</th>
+                  <th className="px-2 py-3">Open</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {(recentRunsRes.data ?? []).map((run) => (
+                  <tr key={run.id} className="border-b border-gray-50">
+                    <td className="px-2 py-3 text-gray-700">{(run.workflows as { title?: string } | null)?.title ?? 'Workflow'}</td>
+                    <td className="px-2 py-3 text-gray-600">{formatDate(run.created_at)}</td>
+                    <td className="px-2 py-3">
+                      <Badge
+                        className={
+                          run.status === 'complete'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : run.status === 'failed'
+                              ? 'bg-rose-100 text-rose-700'
+                              : 'bg-amber-100 text-amber-700'
+                        }
+                      >
+                        {run.status}
+                      </Badge>
+                    </td>
+                    <td className="px-2 py-3">
+                      <Link href={`/runs/${run.id}`} className="text-brand-700 hover:text-brand-600">
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </div>
   );

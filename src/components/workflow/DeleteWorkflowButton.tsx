@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/components/ui/toast';
 
 export function DeleteWorkflowButton({ workflowId }: { workflowId: string }) {
@@ -16,10 +15,14 @@ export function DeleteWorkflowButton({ workflowId }: { workflowId: string }) {
     }
 
     try {
-      const supabase = createClient();
-      const { error } = await supabase.from('workflows').delete().eq('id', workflowId);
-      if (error) {
-        throw error;
+      const response = await fetch(`/api/workflows/${workflowId}`, {
+        method: 'DELETE'
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete workflow');
       }
 
       notify('Workflow deleted.', 'success');

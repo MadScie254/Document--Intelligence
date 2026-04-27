@@ -46,7 +46,20 @@ export default async function WorkflowDetailPage({ params }: { params: { id: str
       <section className="space-y-3">
         <h2 className="text-lg font-semibold text-gray-900">Run History</h2>
         {(runs ?? []).length === 0 ? (
-          <Card className="p-6 text-sm text-gray-500">No runs yet for this workflow.</Card>
+          <Card className="p-6 text-center text-sm text-gray-500">
+            <p className="text-base font-medium text-gray-900">No runs yet</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Trigger the first run to generate a document and store the output version here.
+            </p>
+            <div className="mt-4 flex justify-center gap-3">
+              <Link href={`/workflows/${workflow.id}/run`}>
+                <Button>Run this workflow</Button>
+              </Link>
+              <Link href={`/workflows/${workflow.id}/edit`}>
+                <Button className="bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50">Edit workflow</Button>
+              </Link>
+            </div>
+          </Card>
         ) : (
           (runs ?? []).map((run) => (
             <RunCard key={run.id} id={run.id} workflowTitle={workflow.title} createdAt={run.created_at} status={run.status} />

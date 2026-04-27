@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { WorkflowCard } from '@/components/workflow/WorkflowCard';
 import { createClient } from '@/lib/supabase/server';
 
@@ -33,9 +34,22 @@ export default async function WorkflowsPage() {
       </div>
 
       {(workflows ?? []).length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
-          No workflows yet. Create your first workflow to begin.
-        </div>
+        <Card className="border-dashed border-gray-300 p-10 text-center">
+          <div className="mx-auto max-w-lg space-y-3">
+            <h2 className="text-xl font-semibold text-gray-900">No workflows yet</h2>
+            <p className="text-sm text-gray-500">
+              Start by creating a workflow template. You’ll define fields, the output format, and the document text in one place.
+            </p>
+            <div className="flex justify-center gap-3 pt-2">
+              <Link href="/workflows/new">
+                <Button>Create your first workflow</Button>
+              </Link>
+              <Link href="/">
+                <Button className="bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50">Back to dashboard</Button>
+              </Link>
+            </div>
+          </div>
+        </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {(workflows ?? []).map((workflow) => (
