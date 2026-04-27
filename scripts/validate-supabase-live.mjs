@@ -28,7 +28,7 @@ function loadEnvFromFile(filePath) {
 function mustGetEnv(name) {
   const value = process.env[name];
   if (!value) {
-    throw new Error(`Missing required env var: ${name}`);
+    throw new Error(`Missing required env var: ${name}. Set it in .env.local and retry.`);
   }
   return value;
 }
@@ -249,6 +249,11 @@ async function main() {
   }
 }
 
-main().catch(() => {
-  process.exit(1);
+main().catch((error) => {
+  if (error instanceof Error) {
+    console.error(`Validation script exited with error: ${error.message}`);
+  } else {
+    console.error('Validation script exited with an unknown error.');
+  }
+  process.exitCode = 1;
 });
