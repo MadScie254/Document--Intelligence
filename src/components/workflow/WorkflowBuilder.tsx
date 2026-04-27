@@ -24,7 +24,6 @@ const formSchema = z.object({
 });
 
 interface WorkflowBuilderProps {
-  userId: string;
   workflow?: Workflow;
 }
 
@@ -44,7 +43,7 @@ const createField = (index: number): FieldSchema => ({
   placeholder: ''
 });
 
-export function WorkflowBuilder({ userId, workflow }: WorkflowBuilderProps) {
+export function WorkflowBuilder({ workflow }: WorkflowBuilderProps) {
   const router = useRouter();
   const { notify } = useToast();
   const [saving, setSaving] = useState(false);

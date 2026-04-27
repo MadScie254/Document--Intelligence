@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { RunCard } from '@/components/run/RunCard';

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import type { EmailOtpType } from '@supabase/supabase-js';
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
   const type = requestUrl.searchParams.get('type');
   const next = requestUrl.searchParams.get('next') ?? '/workflows';
 
-  let response = NextResponse.redirect(new URL(next, request.url));
+  const response = NextResponse.redirect(new URL(next, request.url));
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,10 +19,10 @@ export async function GET(request: NextRequest) {
         get(name: string) {
           return request.cookies.get(name)?.value;
         },
-        set(name: string, value: string, options: any) {
+        set(name: string, value: string, options: CookieOptions) {
           response.cookies.set({ name, value, ...options });
         },
-        remove(name: string, options: any) {
+        remove(name: string, options: CookieOptions) {
           response.cookies.set({ name, value: '', ...options });
         }
       }
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (tokenHash && type) {
-    await supabase.auth.verifyOtp({ token_hash: tokenHash, type: type as any });
+    await supabase.auth.verifyOtp({ token_hash: tokenHash, type: type as EmailOtpType });
     return response;
   }
 

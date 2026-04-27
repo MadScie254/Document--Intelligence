@@ -19,7 +19,6 @@ function createSupabase(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const response = NextResponse.json({ ok: true });
   const supabase = createSupabase(request);
 
   const {
@@ -73,7 +72,6 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const response = NextResponse.json({ ok: true });
   const supabase = createSupabase(request);
 
   const {

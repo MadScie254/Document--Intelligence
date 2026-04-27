@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/client';
 import { resolveTemplate } from '@/lib/utils';
 import { generatePDF } from '@/lib/pdf';
 import { generateDOCX } from '@/lib/docx';
-import type { Run, Workflow } from '@/types';
+import type { Workflow } from '@/types';
 
 type RunStep = 'idle' | 'generating' | 'uploading' | 'emailing' | 'done' | 'error';
 
