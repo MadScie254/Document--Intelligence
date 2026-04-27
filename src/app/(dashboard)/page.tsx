@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
 
@@ -47,19 +48,22 @@ export default async function DashboardPage() {
       <section className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900">Recent Runs</h2>
         {(recentRunsRes.data ?? []).length === 0 ? (
-          <div className="mt-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-            <p className="text-base font-medium text-gray-900">No runs yet</p>
-            <p className="mt-1 text-sm text-gray-500">
-              Once you run a workflow, the latest executions will appear here with timestamps and status.
-            </p>
-            <div className="mt-4 flex justify-center gap-3">
-              <Link href="/workflows/new">
-                <Button>Build a Workflow</Button>
-              </Link>
-              <Link href="/workflows">
-                <Button className="bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50">Browse Workflows</Button>
-              </Link>
-            </div>
+          <div className="mt-4">
+            <EmptyState
+              title="No runs yet"
+              description="Once you run a workflow, the latest executions will appear here with timestamps and status."
+              className="bg-gray-50"
+              actions={
+                <div className="flex justify-center gap-3">
+                  <Link href="/workflows/new">
+                    <Button>Build a Workflow</Button>
+                  </Link>
+                  <Link href="/workflows">
+                    <Button className="bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50">Browse Workflows</Button>
+                  </Link>
+                </div>
+              }
+            />
           </div>
         ) : (
           <div className="mt-4 overflow-auto">
