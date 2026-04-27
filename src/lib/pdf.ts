@@ -1,6 +1,7 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import type { TDocumentDefinitions } from 'pdfmake/interfaces';
+
+type TDocumentDefinitions = Record<string, unknown>;
 
 (pdfMake as typeof pdfMake & { vfs: unknown }).vfs = pdfFonts.pdfMake.vfs;
 
@@ -29,6 +30,6 @@ export function generatePDF(
       defaultStyle: { font: 'Roboto' }
     };
 
-    pdfMake.createPdf(docDef).getBlob((blob) => resolve(blob));
+    pdfMake.createPdf(docDef).getBlob((blob: Blob) => resolve(blob));
   });
 }
