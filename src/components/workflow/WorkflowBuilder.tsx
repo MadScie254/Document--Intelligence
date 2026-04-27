@@ -11,7 +11,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
-import { createClient } from '@/lib/supabase/client';
 import type { FieldSchema, Workflow, WorkflowFormData } from '@/types';
 import { FieldEditor } from '@/components/workflow/FieldEditor';
 import { resolveTemplate } from '@/lib/utils';
@@ -122,31 +121,33 @@ export function WorkflowBuilder({ userId, workflow }: WorkflowBuilderProps) {
     setSaving(true);
 
     try {
-      const payload: WorkflowFormData & { user_id: string; id?: string } = {
+      const payload: WorkflowFormData & { id?: string } = {
         ...values,
         description: values.description || null,
         email_to: values.email_to || null,
-        fields,
-        user_id: userId
+        fields
       };
 
       if (workflow?.id) {
         payload.id = workflow.id;
       }
 
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('workflows')
-        .upsert(payload)
-        .select('id')
-        .single();
+      const response = await fetch('/api/workflows', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
 
-      if (error) {
-        throw error;
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to save workflow');
       }
 
       notify('Workflow saved successfully.', 'success');
-      router.push(`/workflows/${data.id}`);
+      router.push(`/workflows/${result.data.id}`);
       router.refresh();
     } catch {
       notify('Failed to save workflow.', 'error');

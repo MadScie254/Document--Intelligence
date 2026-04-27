@@ -52,12 +52,22 @@ export const runCreatePayloadSchema = z.object({
 
 export const runFinalizePayloadSchema = z.object({
   runId: z.string().uuid(),
-  filePath: z.string().min(1),
-  fileName: z.string().min(1),
   status: z.enum(['complete', 'failed']).default('complete'),
+  filePath: z.string().optional(),
+  fileName: z.string().optional(),
   emailSentTo: z.string().nullable().optional(),
   emailSentAt: z.string().datetime().nullable().optional(),
   errorMessage: z.string().nullable().optional()
+}).superRefine((value, ctx) => {
+  if (value.status === 'complete') {
+    if (!value.filePath || value.filePath.trim().length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['filePath'], message: 'File path is required when a run completes' });
+    }
+
+    if (!value.fileName || value.fileName.trim().length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['fileName'], message: 'File name is required when a run completes' });
+    }
+  }
 });
 
 export type WorkflowPayload = z.infer<typeof workflowPayloadSchema>;

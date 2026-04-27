@@ -83,23 +83,26 @@ export default function RunWorkflowPage() {
         throw new Error('User session not found');
       }
 
-      const { data: newRun, error: runError } = await supabase
-        .from('runs')
-        .insert({
-          workflow_id: workflow.id,
-          user_id: user.id,
+      const createResponse = await fetch('/api/runs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          workflowId: workflow.id,
           data: values,
-          output_format: workflow.output_format,
-          status: 'pending'
+          outputFormat: workflow.output_format
         })
-        .select('id')
-        .single();
+      });
 
-      if (runError || !newRun) {
-        throw runError;
+      const createResult = await createResponse.json();
+
+      if (!createResponse.ok) {
+        throw new Error(createResult.error || 'Failed to create run');
       }
 
-      runId = newRun.id;
+      runId = createResult.data.id;
+      setInitialValues(values);
 
       setStep('generating');
       const resolved = resolveTemplate(workflow.template, values);
@@ -123,17 +126,23 @@ export default function RunWorkflowPage() {
         throw uploadError;
       }
 
-      const { error: updateError } = await supabase
-        .from('runs')
-        .update({
-          status: 'complete',
-          file_path: filePath,
-          file_name: `${workflow.title}_${runId}.${extension}`
+      const finalizeResponse = await fetch('/api/runs', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          runId,
+          filePath,
+          fileName: `${workflow.title}_${runId}.${extension}`,
+          status: 'complete'
         })
-        .eq('id', runId);
+      });
 
-      if (updateError) {
-        throw updateError;
+      const finalizeResult = await finalizeResponse.json();
+
+      if (!finalizeResponse.ok) {
+        throw new Error(finalizeResult.error || 'Failed to update run');
       }
 
       if (workflow.email_to) {
@@ -161,20 +170,34 @@ export default function RunWorkflowPage() {
             throw new Error('Email dispatch failed');
           }
 
-          await supabase
-            .from('runs')
-            .update({
-              email_sent_to: recipients.join(', '),
-              email_sent_at: new Date().toISOString()
+          await fetch('/api/runs', {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              runId,
+              filePath,
+              fileName: `${workflow.title}_${runId}.${extension}`,
+              status: 'complete',
+              emailSentTo: recipients.join(', '),
+              emailSentAt: new Date().toISOString()
             })
-            .eq('id', runId);
+          });
         } catch {
-          await supabase
-            .from('runs')
-            .update({
-              error_message: 'Email dispatch failed.'
+          await fetch('/api/runs', {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              runId,
+              filePath,
+              fileName: `${workflow.title}_${runId}.${extension}`,
+              status: 'complete',
+              errorMessage: 'Email dispatch failed.'
             })
-            .eq('id', runId);
+          });
         }
       }
 
@@ -184,7 +207,19 @@ export default function RunWorkflowPage() {
       router.refresh();
     } catch {
       if (runId) {
-        await supabase.from('runs').update({ status: 'failed', error_message: 'Run generation failed.' }).eq('id', runId);
+        await fetch('/api/runs', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            runId,
+            filePath: '',
+            fileName: '',
+            status: 'failed',
+            errorMessage: 'Run generation failed.'
+          })
+        });
       }
       setStep('error');
       notify('Run failed. Please retry.', 'error');
