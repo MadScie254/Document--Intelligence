@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import type { Route } from 'next';
 import { Activity, LayoutGrid, PlayCircle, Workflow } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -10,7 +11,7 @@ const navItems = [
   { href: '/workflows', label: 'Workflows', icon: Workflow },
   { href: '/workflows/new', label: 'New Workflow', icon: PlayCircle },
   { href: '/runs/recent', label: 'Recent Runs', icon: Activity }
-];
+] as Array<{ href: Route; label: string; icon: React.ComponentType<{ size?: number }> }>;
 
 export function Sidebar() {
   const pathname = usePathname();
