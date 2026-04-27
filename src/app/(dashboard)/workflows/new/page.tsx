@@ -1,8 +1,21 @@
-export default function NewWorkflowPage() {
+import { redirect } from 'next/navigation';
+import { WorkflowBuilder } from '@/components/workflow/WorkflowBuilder';
+import { createClient } from '@/lib/supabase/server';
+
+export default async function NewWorkflowPage() {
+  const supabase = createClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
   return (
-    <main style={{ padding: '24px' }}>
-      <h1>New Workflow</h1>
-      <p>Workflow builder UI will be added in a later phase.</p>
-    </main>
+    <div className="space-y-4">
+      <h1 className="text-2xl font-semibold text-gray-900">Create Workflow</h1>
+      <WorkflowBuilder userId={user.id} />
+    </div>
   );
 }
